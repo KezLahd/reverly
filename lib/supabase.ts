@@ -12,5 +12,10 @@ export function getSupabase() {
   return supabaseInstance
 }
 
-// For backward compatibility
-export const supabase = getSupabase()
+// For backward compatibility - uses singleton pattern
+export const supabase = (() => {
+  if (typeof window !== 'undefined') {
+    return getSupabase()
+  }
+  return null
+})()

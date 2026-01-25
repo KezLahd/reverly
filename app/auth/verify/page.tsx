@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Building2, Mail, Loader2 } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 
 export default function VerifyPage() {
@@ -25,6 +25,7 @@ export default function VerifyPage() {
     setSuccess(false)
 
     try {
+      const supabase = getSupabase()
       // Send a magic link instead of relying on the confirmation email
       const { error } = await supabase.auth.signInWithOtp({
         email,

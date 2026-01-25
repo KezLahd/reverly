@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import { AlertCircle, RefreshCw } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -31,6 +31,7 @@ export default function AuthErrorPage() {
     setIsResending(true)
     setResendMessage("")
     try {
+      const supabase = getSupabase()
       const { error } = await supabase.auth.signInWithOtp({
         email: email,
         options: {

@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Toast } from "@/components/ui/toast"
 import { Building2, Eye, EyeOff, Loader2, AlertCircle, ArrowLeft, Users, Plus, Minus, ChevronsUpDown, Check } from "lucide-react" // Removed MapPin
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"

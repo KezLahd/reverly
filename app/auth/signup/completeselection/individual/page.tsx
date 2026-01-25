@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Toast } from "@/components/ui/toast"
 import { Building2, Eye, EyeOff, Check, ChevronsUpDown, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -37,6 +37,7 @@ export default function IndividualSignUpPage() {
   useEffect(() => {
     // Check if user is already logged in and has confirmed email
     const checkUser = async () => {
+      const supabase = getSupabase()
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         // Get first name and email for greeting

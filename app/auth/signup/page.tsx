@@ -17,7 +17,7 @@ import {
   CheckCircle2,
   ArrowLeft,
 } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { GlowButton } from "@/components/glow-button"
 
@@ -95,6 +95,7 @@ export default function SignUpPage() {
     setIsLoading(true)
     
     try {
+      const supabase = getSupabase()
       // Note: Skipping RPC check - auth will handle duplicate emails
       // Proceed directly with sign up
       const { error: signUpError } = await supabase.auth.signUp({
@@ -156,6 +157,7 @@ export default function SignUpPage() {
     setResendMessage("");
     
     try {
+      const supabase = getSupabase()
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: formData.email,
