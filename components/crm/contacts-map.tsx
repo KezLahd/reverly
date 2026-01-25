@@ -329,4 +329,4 @@ export function ContactsMap({ contacts, className, defaultLocation, fullControls
       </CardContent>
     </Card>
   )
-} 
+}

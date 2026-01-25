@@ -230,8 +230,10 @@ export default function AgencySignUpForm() {
         upsertObj
       ]);
       if (upsertError) {
+        console.error("[v0] Upsert error details:", upsertError);
         toast({
-          title: "Failed to complete signup. Please try again.",
+          title: "Database error saving profile",
+          description: upsertError.message || "Failed to complete signup. Please try again.",
           variant: "destructive",
         });
         setIsLoading(false);

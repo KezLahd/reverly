@@ -118,4 +118,4 @@ export default function AuthErrorPage() {
       </div>
     </div>
   )
-} 
+}

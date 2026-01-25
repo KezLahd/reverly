@@ -245,4 +245,4 @@ export function AnalyticsTable({
       </div>
     </div>
   )
-} 
+}

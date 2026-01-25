@@ -51,4 +51,4 @@ declare global {
     google: any
     initMap: () => void
   }
-} 
+}

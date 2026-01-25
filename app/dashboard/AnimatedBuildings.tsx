@@ -605,4 +605,4 @@ export function AnimatedBuildings({ onFinish }: { onFinish?: () => void }) {
       )}
     </div>
   );
-} 
+}

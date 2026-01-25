@@ -92,23 +92,24 @@ export default function IndividualSignUpPage() {
         return;
       }
       // Upsert into user_profiles
-      const { error: upsertError } = await supabase.from('user_profiles').upsert([
-        {
-          id: user.id,
-          first_name: user.user_metadata?.first_name || '',
-          last_name: user.user_metadata?.last_name || '',
-          email: user.email,
-          phone_number: formData.phoneNumber,
-          user_type: "individual",
-          selected_agency: selectedAgency?.name || null,
-          agency_id: selectedAgency?.id || null,
-          marketing_opt_in: formData.marketingOptIn,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-      ]);
+      const upsertData = {
+        id: user.id,
+        first_name: user.user_metadata?.first_name || '',
+        last_name: user.user_metadata?.last_name || '',
+        email: user.email,
+        phone_number: formData.phoneNumber,
+        user_type: "individual",
+        selected_agency: selectedAgency?.name || null,
+        agency_id: selectedAgency?.id || null,
+        marketing_opt_in: formData.marketingOptIn,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      console.log("[v0] Individual upsert data:", upsertData);
+      const { error: upsertError } = await supabase.from('user_profiles').upsert([upsertData]);
       if (upsertError) {
-        setError("Failed to complete signup. Please try again.");
+        console.error("[v0] Upsert error details:", upsertError);
+        setError(`Database error: ${upsertError.message || "Failed to complete signup. Please try again."}`);
         setIsLoading(false);
         return;
       }
