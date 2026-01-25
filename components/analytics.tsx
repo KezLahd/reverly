@@ -349,39 +349,37 @@ interface PropertyRow {
   sell_prediction_score: string | null
 }
 
-// Update DEFAULT_COLUMNS to match DB
+// Update DEFAULT_COLUMNS to match DB - Agent columns first, always visible
 const DEFAULT_COLUMNS = [
+  { key: "agent_profile_url", label: "Agent Profile" },
+  { key: "last_agent", label: "Last Agent" },
   { key: "address", label: "Address" },
   { key: "last_contacted", label: "Date Last Contacted" },
   { key: "method", label: "Method" },
   { key: "readiness", label: "Readiness to Sell" },
   { key: "next_contact", label: "Suggested Next Contact" },
   { key: "estimated_value", label: "Est. Value" },
-  { key: "last_agent", label: "Last Agent" },
-  { key: "agent_profile_url", label: "Agent Profile" },
   { key: "interaction_count", label: "Interactions" },
   { key: "lead_status", label: "Lead Status" },
   { key: "sell_prediction_score", label: "Sell Prediction" },
 ]
 
-const methodIcon = (method: string) => {
-  if (method === "door") return <DoorOpen className="h-5 w-5 text-purple-600" />
-  if (method === "phone") return <Phone className="h-5 w-5 text-purple-600" />
-  if (method === "ai") return <Bot className="h-5 w-5 text-purple-600" />
-  return null
+const getDefaultVisibleColumns = () => {
+  // Agent columns are always visible (first 2), toggle 4 others on desktop
+  const agentColumns = ["agent_profile_url", "last_agent"]
+  const toggleableColumns = DEFAULT_COLUMNS.slice(2) // address, last_contacted, method, readiness, etc.
+  
+  if (typeof window !== "undefined" && window.innerWidth < 768) {
+    return DEFAULT_COLUMNS.map(c => c.key) // all on mobile
+  }
+  // On desktop: always show agent columns + first 4 toggleable columns
+  return [...agentColumns, ...toggleableColumns.slice(0, 4).map(c => c.key)]
 }
 
 const readinessColor = (score: number) => {
   if (score <= 33) return "bg-gradient-to-r from-red-500 to-red-300 text-white"
   if (score <= 66) return "bg-gradient-to-r from-yellow-400 to-yellow-200 text-gray-900"
   return "bg-gradient-to-r from-green-500 to-green-300 text-white"
-}
-
-const getDefaultVisibleColumns = () => {
-  if (typeof window !== "undefined" && window.innerWidth < 768) {
-    return DEFAULT_COLUMNS.map(c => c.key) // all on mobile
-  }
-  return DEFAULT_COLUMNS.slice(0, 4).map(c => c.key) // first 4 on desktop
 }
 
 // Add filter types
@@ -464,6 +462,9 @@ export function Analytics() {
   }, [])
 
   const toggleColumn = (key: string) => {
+    // Prevent toggling agent columns - they're always visible
+    if (key === "agent_profile_url" || key === "last_agent") return
+    
     setVisibleColumns(cols =>
       cols.includes(key) ? cols.filter(c => c !== key) : [...cols, key]
     )
@@ -652,17 +653,24 @@ export function Analytics() {
                       </Popover.Button>
                       <Popover.Panel className="absolute right-0 mt-2 bg-white rounded shadow-lg p-2 w-44 z-50 border border-slate-200">
                         <div className="font-semibold mb-1 text-xs text-slate-700">Show Columns</div>
-                        {DEFAULT_COLUMNS.map(col => (
-                          <label key={col.key} className="flex items-center space-x-2 py-1 cursor-pointer text-xs text-slate-700">
-                            <input
-                              type="checkbox"
-                              checked={visibleColumns.includes(col.key)}
-                              onChange={() => toggleColumn(col.key)}
-                              className="accent-primary h-3 w-3"
-                            />
-                            <span className="truncate">{col.label}</span>
-                          </label>
-                        ))}
+                        {DEFAULT_COLUMNS.map(col => {
+                          const isAgentColumn = col.key === "agent_profile_url" || col.key === "last_agent"
+                          return (
+                            <label key={col.key} className="flex items-center space-x-2 py-1 cursor-pointer text-xs text-slate-700">
+                              <input
+                                type="checkbox"
+                                checked={visibleColumns.includes(col.key)}
+                                onChange={() => toggleColumn(col.key)}
+                                disabled={isAgentColumn}
+                                className="accent-primary h-3 w-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                              />
+                              <span className={`truncate ${isAgentColumn ? 'font-medium text-slate-500' : ''}`}>
+                                {col.label}
+                                {isAgentColumn && <span className="text-slate-400 text-xs ml-1">(always visible)</span>}
+                              </span>
+                            </label>
+                          )
+                        })}
                       </Popover.Panel>
                     </Popover>
                   </div>
