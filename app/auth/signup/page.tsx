@@ -95,29 +95,8 @@ export default function SignUpPage() {
     setIsLoading(true)
     
     try {
-      // Check user status using the secure function
-      const { data: userStatus, error: userCheckError } = await supabase
-        .rpc('check_user_status', {
-          email: formData.email
-        }) as { data: UserStatus | null, error: any };
-
-      // If we get a result
-      if (!userCheckError && userStatus) {
-        if (userStatus.exists) {
-          if (userStatus.is_verified) {
-            // User exists and is verified
-            setSuccessType('verified');
-          } else {
-            // User exists but not verified
-            setSuccessType('unverified');
-          }
-          setShowSuccess(true);
-          return;
-        }
-        // If userStatus.exists is false, proceed with sign up
-      }
-
-      // If user doesn't exist, proceed with sign up
+      // Note: Skipping RPC check - auth will handle duplicate emails
+      // Proceed directly with sign up
       const { error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -134,7 +113,6 @@ export default function SignUpPage() {
       if (signUpError) {
         // Handle specific errors
         if (signUpError.message.includes('User already registered')) {
-          // This should be rare since we already checked, but handle it
           setSuccessType('unverified');
           setShowSuccess(true);
         } else {

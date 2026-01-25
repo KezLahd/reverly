@@ -102,7 +102,6 @@ export default function IndividualSignUpPage() {
         selected_agency: selectedAgency?.name || null,
         agency_id: selectedAgency?.id || null,
         marketing_opt_in: formData.marketingOptIn,
-        created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
       console.log("[v0] Individual upsert data:", upsertData);
