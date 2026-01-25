@@ -10,12 +10,7 @@ export function AuthListener() {
     const supabase = getSupabase();
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session?.user) {
-        if (session.user.email) {
-          await supabase
-            .from("reverly_signups")
-            .update({ has_confirmed_email: true })
-            .eq("email", session.user.email);
-        }
+        // User signed in successfully, redirect to billing
         router.push("/billing");
       }
     });
