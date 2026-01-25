@@ -49,9 +49,6 @@ export default function AgencySignUpForm() {
   const [agencySearchOpen, setAgencySearchOpen] = useState(false);
   const [selectedAgency, setSelectedAgency] = useState<{ id: string; name: string; location: string } | null>(null);
 
-  // Get the Google Places API key from the environment
-  const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
-
   const pricePerUser = 11.95
   const totalWeeklyPrice = formData.numberOfUsers * pricePerUser
   const totalMonthlyPrice = totalWeeklyPrice * 4.33 // Average weeks per month
@@ -98,37 +95,7 @@ export default function AgencySignUpForm() {
       }
     };
     checkUser();
-
-    // Google Places Autocomplete logic
-    function initAutocomplete() {
-      if (window.google && locationInputRef.current) {
-        const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current, {
-          types: ["(cities)"]
-        })
-        autocomplete.addListener("place_changed", () => {
-          const place = autocomplete.getPlace()
-          if (place && place.formatted_address) {
-            setFormData((prev) => ({ ...prev, agencyLocation: place.formatted_address }))
-          } else if (place && place.name) {
-            setFormData((prev) => ({ ...prev, agencyLocation: place.name }))
-          }
-        })
-      }
-    }
-
-    if (!window.google) {
-      // Only add script if not already present
-      const script = document.createElement("script")
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_PLACES_API_KEY}&libraries=places`;
-      script.async = true
-      script.onload = initAutocomplete
-      document.body.appendChild(script)
-    } else {
-      initAutocomplete()
-    }
-  }, [router, GOOGLE_PLACES_API_KEY])
-
-  // Removed initializeAutocomplete function
+  }, [router])
 
   const handleAgencySelect = (agency: { id: string; name: string; location: string } | null) => {
     if (!agency) {

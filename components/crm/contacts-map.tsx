@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { loadGoogleMaps } from "@/lib/google-maps"
 
 interface Contact {
   id: string

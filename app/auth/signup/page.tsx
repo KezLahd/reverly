@@ -112,6 +112,7 @@ export default function SignUpPage() {
       })
 
       if (signUpError) {
+        console.error("[v0] Sign up error:", signUpError);
         // Handle specific errors
         if (signUpError.message.includes('User already registered')) {
           setSuccessType('unverified');
@@ -162,11 +163,12 @@ export default function SignUpPage() {
         type: 'signup',
         email: formData.email,
         options: {
-          emailRedirectTo: `https://reverly.mjsons.net/auth/signup/completeselection`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       
       if (error) {
+        console.error("[v0] Resend error:", error);
         if (error.message.includes('Too Many Requests')) {
           setResendMessage("Too many attempts. Please wait a few minutes before trying again.");
         } else {
