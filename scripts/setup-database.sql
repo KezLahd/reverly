@@ -11,10 +11,13 @@ DROP TABLE IF EXISTS public.reverly_user_profiles CASCADE;
 -- Add full_name column to user_profiles if it doesn't exist
 ALTER TABLE IF EXISTS public.user_profiles ADD COLUMN IF NOT EXISTS full_name TEXT;
 
+-- Make email nullable since Supabase Auth inserts null initially
+ALTER TABLE IF EXISTS public.user_profiles ALTER COLUMN email DROP NOT NULL;
+
 -- Create user_profiles table (matches Supabase Auth expectations)
 CREATE TABLE IF NOT EXISTS public.user_profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT NOT NULL UNIQUE,
+  email TEXT UNIQUE,
   full_name TEXT,
   first_name TEXT,
   last_name TEXT,
@@ -268,3 +271,24 @@ CREATE INDEX IF NOT EXISTS idx_audio_recordings_user_id ON public.audio_recordin
 CREATE INDEX IF NOT EXISTS idx_agency_subscriptions_owner_id ON public.agency_subscriptions(owner_id);
 CREATE INDEX IF NOT EXISTS idx_agency_users_agency_id ON public.agency_users(agency_id);
 CREATE INDEX IF NOT EXISTS idx_agency_users_user_id ON public.agency_users(user_id);
+
+-- Create function to populate email from auth.users during insert/update
+CREATE OR REPLACE FUNCTION public.populate_user_profile_email()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- If email is null, get it from auth.users
+  IF NEW.email IS NULL THEN
+    SELECT email INTO NEW.email FROM auth.users WHERE id = NEW.id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Drop existing trigger if it exists
+DROP TRIGGER IF EXISTS populate_email_on_insert ON public.user_profiles;
+
+-- Create trigger to auto-populate email from auth.users
+CREATE TRIGGER populate_email_on_insert
+BEFORE INSERT OR UPDATE ON public.user_profiles
+FOR EACH ROW
+EXECUTE FUNCTION public.populate_user_profile_email();
