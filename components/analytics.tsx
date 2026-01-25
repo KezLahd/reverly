@@ -15,10 +15,19 @@ import {
 } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState, useEffect } from "react"
-import { DoorOpen, Phone, Bot, Eye, EyeOff, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Search } from "lucide-react"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { DoorOpen, Phone, Bot, Eye, EyeOff, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Search, Filter, X } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { Popover } from "@headlessui/react"
+import dynamic from 'next/dynamic'
+import { AnalyticsTable } from "./analytics-table"
+import { useRouter } from "next/navigation"
+import { createBrowserClient } from "@supabase/ssr"
+
+// Dynamically import the AnalyticsTable component with SSR disabled
+const DynamicAnalyticsTable = dynamic(() => Promise.resolve(AnalyticsTable), {
+  ssr: false
+})
 
 // Sample data for charts
 const monthlyData = [
@@ -49,6 +58,11 @@ interface PropertyRow {
   readiness: number | null
   next_contact: string | null
   estimated_value: string | null
+  last_agent: string | null
+  agent_profile_url: string | null
+  interaction_count: number | null
+  lead_status: string | null
+  sell_prediction_score: string | null
 }
 
 // Update DEFAULT_COLUMNS to match DB
@@ -59,6 +73,11 @@ const DEFAULT_COLUMNS = [
   { key: "readiness", label: "Readiness to Sell" },
   { key: "next_contact", label: "Suggested Next Contact" },
   { key: "estimated_value", label: "Est. Value" },
+  { key: "last_agent", label: "Last Agent" },
+  { key: "agent_profile_url", label: "Agent Profile" },
+  { key: "interaction_count", label: "Interactions" },
+  { key: "lead_status", label: "Lead Status" },
+  { key: "sell_prediction_score", label: "Sell Prediction" },
 ]
 
 const methodIcon = (method: string) => {
@@ -81,6 +100,51 @@ const getDefaultVisibleColumns = () => {
   return DEFAULT_COLUMNS.slice(0, 4).map(c => c.key) // first 4 on desktop
 }
 
+// Add filter types
+type FilterType = {
+  [key: string]: {
+    value: string | number | null;
+    operator: 'equals' | 'contains' | 'greater' | 'less' | 'between' | null;
+    secondValue?: string | number | null;
+  };
+};
+
+// Lead status order and icon/color mapping
+const LEAD_STATUS_ORDER = [
+  'inactive',
+  'cold',
+  'new',
+  'interested',
+  'warm',
+  'hot',
+];
+const leadStatusTheme = {
+  inactive: {
+    icon: <span role="img" aria-label="Frozen" className="mr-1">❄️</span>,
+    className: 'bg-slate-200 text-slate-500 border border-slate-300',
+  },
+  cold: {
+    icon: <span role="img" aria-label="Cold" className="mr-1">🧊</span>,
+    className: 'bg-blue-100 text-blue-600 border border-blue-200',
+  },
+  new: {
+    icon: <span role="img" aria-label="New" className="mr-1">🌱</span>,
+    className: 'bg-green-100 text-green-700 border border-green-200',
+  },
+  interested: {
+    icon: <span role="img" aria-label="Interested" className="mr-1">💡</span>,
+    className: 'bg-yellow-100 text-yellow-700 border border-yellow-200',
+  },
+  warm: {
+    icon: <span role="img" aria-label="Warm" className="mr-1">🌤️</span>,
+    className: 'bg-orange-100 text-orange-700 border border-orange-200',
+  },
+  hot: {
+    icon: <span role="img" aria-label="Hot" className="mr-1">🔥</span>,
+    className: 'bg-red-100 text-red-700 border border-red-200',
+  },
+};
+
 export function Analytics() {
   const [activeTab, setActiveTab] = useState("database")
   const [properties, setProperties] = useState<PropertyRow[]>([])
@@ -92,6 +156,9 @@ export function Analytics() {
   const [sortColumn, setSortColumn] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [searchTerm, setSearchTerm] = useState('')
+  const [columnOrder, setColumnOrder] = useState<string[]>(DEFAULT_COLUMNS.map(col => col.key))
+  const [filters, setFilters] = useState<FilterType>({})
+  const [activeFilter, setActiveFilter] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,7 +166,7 @@ export function Analytics() {
       // Get all rows for client-side pagination
       const { data, error } = await supabase
         .from("landing_page_properties")
-        .select("id, address, last_contacted, method, readiness, next_contact, estimated_value")
+        .select("id, address, last_contacted, method, readiness, next_contact, estimated_value, last_agent, agent_profile_url, interaction_count, lead_status, sell_prediction_score")
         .order("last_contacted", { ascending: false })
       if (!error && data) setProperties(data as PropertyRow[])
       setLoading(false)
@@ -122,14 +189,65 @@ export function Analytics() {
     )
   }
 
-  // Sorting and filtering logic
+  // Add filter handlers
+  const handleFilterChange = (column: string, value: string | number | null, operator: 'equals' | 'contains' | 'greater' | 'less' | 'between' | null, secondValue?: string | number | null) => {
+    setFilters(prev => ({
+      ...prev,
+      [column]: { value, operator, secondValue }
+    }))
+  }
+
+  const clearFilter = (column: string) => {
+    setFilters(prev => {
+      const newFilters = { ...prev }
+      delete newFilters[column]
+      return newFilters
+    })
+  }
+
+  const clearAllFilters = () => {
+    setFilters({})
+  }
+
+  // Update sorting and filtering logic
   const getSortedFilteredProperties = () => {
     let filtered = properties
+
+    // Apply search term filter
     if (searchTerm.trim()) {
       filtered = filtered.filter(row =>
         row.address?.toLowerCase().includes(searchTerm.trim().toLowerCase())
       )
     }
+
+    // Apply column filters
+    Object.entries(filters).forEach(([column, filter]) => {
+      if (!filter.value && !filter.secondValue) return
+
+      filtered = filtered.filter(row => {
+        const value = row[column as keyof PropertyRow]
+        if (value === null) return false
+
+        switch (filter.operator) {
+          case 'equals':
+            return String(value).toLowerCase() === String(filter.value).toLowerCase()
+          case 'contains':
+            return String(value).toLowerCase().includes(String(filter.value).toLowerCase())
+          case 'greater':
+            return Number(value) > Number(filter.value)
+          case 'less':
+            return Number(value) < Number(filter.value)
+          case 'between':
+            if (!filter.secondValue) return true
+            const numValue = Number(value)
+            return numValue >= Number(filter.value) && numValue <= Number(filter.secondValue)
+          default:
+            return true
+        }
+      })
+    })
+
+    // Apply sorting
     if (sortColumn) {
       filtered = [...filtered].sort((a, b) => {
         let aVal = a[sortColumn as keyof PropertyRow]
@@ -155,6 +273,21 @@ export function Analytics() {
           const aDate = aVal ? new Date(aVal as string).getTime() : 0
           const bDate = bVal ? new Date(bVal as string).getTime() : 0
           return sortDirection === 'asc' ? aDate - bDate : bDate - aDate
+        }
+        if (sortColumn === 'interaction_count') {
+          const aNum = aVal && !isNaN(Number(aVal)) ? Number(aVal) : 0
+          const bNum = bVal && !isNaN(Number(bVal)) ? Number(bVal) : 0
+          return sortDirection === 'asc' ? aNum - bNum : bNum - aNum
+        }
+        if (sortColumn === 'sell_prediction_score') {
+          const aNum = aVal && !isNaN(Number(aVal)) ? Number(aVal) : 0
+          const bNum = bVal && !isNaN(Number(bVal)) ? Number(bVal) : 0
+          return sortDirection === 'asc' ? aNum - bNum : bNum - aNum
+        }
+        if (sortColumn === 'lead_status') {
+          const aIdx = aVal && typeof aVal === 'string' ? LEAD_STATUS_ORDER.indexOf(aVal.toLowerCase()) : -1;
+          const bIdx = bVal && typeof bVal === 'string' ? LEAD_STATUS_ORDER.indexOf(bVal.toLowerCase()) : -1;
+          return sortDirection === 'asc' ? aIdx - bIdx : bIdx - aIdx;
         }
         if (typeof aVal === 'string' && typeof bVal === 'string') {
           return sortDirection === 'asc'
@@ -253,87 +386,25 @@ export function Analytics() {
                       </Popover.Panel>
                     </Popover>
                   </div>
-                  {/* Table with horizontal scroll and nowrap headers */}
-                  <div className="overflow-x-auto rounded-lg border border-slate-200">
-                    <table className="min-w-full bg-white text-sm">
-                      <thead className="bg-slate-50">
-                        <tr>
-                          {DEFAULT_COLUMNS.filter(col => visibleColumns.includes(col.key)).map(col => (
-                            <th
-                              key={col.key}
-                              className="px-4 py-3 font-semibold text-left cursor-pointer group whitespace-nowrap select-none"
-                              onClick={() =>
-                                ["address", "last_contacted", "method", "readiness", "estimated_value"].includes(col.key)
-                                  ? handleSort(col.key)
-                                  : undefined
-                              }
-                            >
-                              <span className="flex items-center gap-1">
-                                {col.label}
-                                {["address", "last_contacted", "method", "readiness", "estimated_value"].includes(col.key) && (
-                                  sortColumn === col.key ? (
-                                    sortDirection === 'asc' ? <ChevronUp className="inline h-4 w-4 text-primary" /> : <ChevronDown className="inline h-4 w-4 text-primary" />
-                                  ) : (
-                                    <ChevronUp className="inline h-4 w-4 text-slate-300 opacity-50" />
-                                  )
-                                )}
-                              </span>
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {loading ? (
-                          <tr><td colSpan={visibleColumns.length} className="text-center py-8">Loading...</td></tr>
-                        ) : paginatedProperties.length === 0 ? (
-                          <tr><td colSpan={visibleColumns.length} className="text-center py-8">No data found.</td></tr>
-                        ) : (
-                          paginatedProperties.map((row, i) => (
-                            <tr key={row.id} className="border-t border-slate-100 hover:bg-slate-50">
-                              {visibleColumns.includes("address") && (
-                                <td className="px-4 py-3 whitespace-nowrap font-medium">{row.address}</td>
-                              )}
-                              {visibleColumns.includes("last_contacted") && (
-                                <td className="px-4 py-3 whitespace-nowrap">{row.last_contacted ? new Date(row.last_contacted).toLocaleDateString() : "-"}</td>
-                              )}
-                              {visibleColumns.includes("method") && (
-                                <td className="px-4 py-3 whitespace-nowrap flex items-center justify-center">{methodIcon(row.method || "")}</td>
-                              )}
-                              {visibleColumns.includes("readiness") && (
-                                <td className="px-4 py-3">
-                                  <span className={`inline-block px-3 py-1 rounded-full font-semibold text-xs ${readinessColor(row.readiness || 0)}`}>{row.readiness ?? "-"}</span>
-                                </td>
-                              )}
-                              {visibleColumns.includes("next_contact") && (
-                                <td className="px-4 py-3 whitespace-nowrap">{row.next_contact ? new Date(row.next_contact).toLocaleDateString() : "-"}</td>
-                              )}
-                              {visibleColumns.includes("estimated_value") && (
-                                <td className="px-4 py-3 whitespace-nowrap">
-                                  {row.estimated_value && !isNaN(Number(row.estimated_value))
-                                    ? `$${Number(row.estimated_value).toLocaleString()}`
-                                    : row.estimated_value || "-"}
-                                </td>
-                              )}
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                    {/* Pagination Footer */}
-                    <div className="flex justify-center items-center bg-slate-100 border-t border-slate-200 py-3 mt-0">
-                      {Array.from({ length: totalPages }, (_, i) => (
-                        <button
-                          key={i + 1}
-                          className={`mx-1 px-3 py-1 rounded font-medium text-sm transition-colors duration-150 ${page === i + 1 ? 'bg-primary text-white' : 'bg-slate-200 text-slate-700 hover:bg-primary/10'}`}
-                          onClick={() => setPage(i + 1)}
-                          disabled={page === i + 1}
-                          aria-current={page === i + 1 ? 'page' : undefined}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  {/* Replace the table section with the dynamic component */}
+                  <DynamicAnalyticsTable
+                    columns={DEFAULT_COLUMNS}
+                    visibleColumns={visibleColumns}
+                    columnOrder={columnOrder}
+                    onColumnOrderChange={setColumnOrder}
+                    onSort={handleSort}
+                    sortColumn={sortColumn}
+                    sortDirection={sortDirection}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    onClearFilter={clearFilter}
+                    onClearAllFilters={clearAllFilters}
+                    data={paginatedProperties}
+                    loading={loading}
+                    page={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                  />
                   {/* RLS Policy Note for Devs */}
                   <div className="text-xs text-slate-400 mt-2">
                     {/* RLS Policy: Public read access is enabled for landing_page_properties only. Other tables remain protected. */}

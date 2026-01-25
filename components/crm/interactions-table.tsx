@@ -28,44 +28,39 @@ interface Interaction {
 
 interface InteractionsTableProps {
   userId: string
-  searchTerm: string
+  searchTerm?: string
+  limit?: number
 }
 
-export function InteractionsTable({ userId, searchTerm }: InteractionsTableProps) {
+export function InteractionsTable({ userId, searchTerm = "", limit }: InteractionsTableProps) {
   const [interactions, setInteractions] = useState<Interaction[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadInteractions()
-  }, [userId, searchTerm])
-
-  const loadInteractions = async () => {
-    try {
-      const query = supabase
+    const fetchInteractions = async () => {
+      setLoading(true)
+      let query = supabase
         .from("interactions")
-        .select(`
-          *,
-          contacts (
-            first_name,
-            last_name
-          )
-        `)
+        .select("*")
         .eq("user_id", userId)
         .order("interaction_date", { ascending: false })
+
+      if (limit) {
+        query = query.limit(limit)
+      }
 
       const { data, error } = await query
 
       if (error) {
-        console.error("Error loading interactions:", error)
+        console.error("Error fetching interactions:", error)
       } else {
         setInteractions(data || [])
       }
-    } catch (error) {
-      console.error("Error loading interactions:", error)
-    } finally {
       setLoading(false)
     }
-  }
+
+    fetchInteractions()
+  }, [userId, limit])
 
   const getInteractionIcon = (type: string) => {
     switch (type) {

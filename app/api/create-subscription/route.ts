@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe-server"
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 
 export async function POST(request: Request) {
@@ -14,7 +14,22 @@ export async function POST(request: Request) {
     }
 
     // Create Supabase client with cookies for authentication
-    const supabase = createRouteHandlerClient({ cookies })
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get: (name) => cookieStore.get(name)?.value,
+          set: (name, value, options) => {
+            cookieStore.set(name, value, options)
+          },
+          remove: (name, options) => {
+            cookieStore.set(name, "", { ...options, maxAge: 0 })
+          },
+        },
+      }
+    )
 
     // Verify the user is authenticated
     const {
@@ -77,9 +92,7 @@ export async function POST(request: Request) {
         {
           price_data: {
             currency: "usd",
-            product_data: {
-              name: `Reverly ${planId.charAt(0).toUpperCase() + planId.slice(1)} Plan`,
-            },
+            product: `Reverly ${planId.charAt(0).toUpperCase() + planId.slice(1)} Plan`,
             unit_amount: planId === "insights" ? 995 : planId === "ai-processing" ? 1995 : 19995, // Amount in cents
             recurring: {
               interval: "week",

@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -21,12 +21,29 @@ import { supabase } from "@/lib/supabase"
 import Link from "next/link"
 import { GlowButton } from "@/components/glow-button"
 
+interface UserStatus {
+  exists: boolean;
+  is_verified: boolean;
+}
+
+function getResendAttempts(email: string) {
+  if (!email) return 0;
+  const key = `resendAttempts_${email}`;
+  const attempts = localStorage.getItem(key);
+  return attempts ? parseInt(attempts, 10) : 0;
+}
+
+function setResendAttempts(email: string, count: number) {
+  if (!email) return;
+  const key = `resendAttempts_${email}`;
+  localStorage.setItem(key, count.toString());
+}
+
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    phoneNumber: "",
     password: "",
     confirmPassword: "",
     agreedToTerms: false,
@@ -34,10 +51,30 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [showSuccess, setShowSuccess] = useState(false)
+  const [successType, setSuccessType] = useState<'new' | 'unverified' | 'verified' | null>(null)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [resendMessage, setResendMessage] = useState("")
   const router = useRouter()
+
+  // Reset success states when email changes
+  useEffect(() => {
+    if (formData.email) {
+      setShowSuccess(false);
+      setSuccessType(null);
+      setResendMessage("");
+    }
+  }, [formData.email]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Reset states
+    setError("")
+    setShowSuccess(false)
+    setSuccessType(null)
+    setResendMessage("")
+
+    // Validation checks
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
       setError("Please fill in all required fields")
       return
@@ -54,9 +91,33 @@ export default function SignUpPage() {
       setError("Please agree to the Terms & Conditions")
       return
     }
+    
     setIsLoading(true)
-    setError("")
+    
     try {
+      // Check user status using the secure function
+      const { data: userStatus, error: userCheckError } = await supabase
+        .rpc('check_user_status', {
+          email: formData.email
+        }) as { data: UserStatus | null, error: any };
+
+      // If we get a result
+      if (!userCheckError && userStatus) {
+        if (userStatus.exists) {
+          if (userStatus.is_verified) {
+            // User exists and is verified
+            setSuccessType('verified');
+          } else {
+            // User exists but not verified
+            setSuccessType('unverified');
+          }
+          setShowSuccess(true);
+          return;
+        }
+        // If userStatus.exists is false, proceed with sign up
+      }
+
+      // If user doesn't exist, proceed with sign up
       const { error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -64,20 +125,87 @@ export default function SignUpPage() {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            phone_number: formData.phoneNumber,
+            full_name: `${formData.firstName} ${formData.lastName}`,
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `https://reverly.mjsons.net/auth/signup/completeselection`,
         },
       })
+
       if (signUpError) {
-        setError(signUpError.message)
-        return
+        // Handle specific errors
+        if (signUpError.message.includes('User already registered')) {
+          // This should be rare since we already checked, but handle it
+          setSuccessType('unverified');
+          setShowSuccess(true);
+        } else {
+          setError(signUpError.message || "An unknown error occurred.");
       }
-      setShowSuccess(true)
+      } else {
+        // New user created successfully
+        setSuccessType('new');
+        setShowSuccess(true);
+      }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const clearForm = () => {
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agreedToTerms: false,
+    });
+    setShowSuccess(false);
+    setSuccessType(null);
+    setResendMessage("");
+  };
+
+  const handleResendEmail = async () => {
+    const attempts = getResendAttempts(formData.email);
+    if (attempts >= 2) {
+      setResendMessage("Maximum resend attempts reached. Please try a different email address.");
+      setTimeout(clearForm, 2000); // Clear form after 2 seconds
+      return;
+    }
+
+    setResendLoading(true);
+    setResendMessage("");
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: formData.email,
+        options: {
+          emailRedirectTo: `https://reverly.mjsons.net/auth/signup/completeselection`,
+        },
+      });
+      
+      if (error) {
+        if (error.message.includes('Too Many Requests')) {
+          setResendMessage("Too many attempts. Please wait a few minutes before trying again.");
+        } else {
+          setResendMessage("Failed to resend email. Please try again.");
+        }
+      } else {
+        const currentAttempts = getResendAttempts(formData.email);
+        setResendAttempts(formData.email, currentAttempts + 1);
+        setResendMessage("New confirmation email sent! Check your inbox.");
+        
+        // If this was the second attempt, clear the form after a delay
+        if (currentAttempts + 1 >= 2) {
+          setTimeout(clearForm, 2000);
+    }
+  }
+    } catch (err) {
+      setResendMessage("Failed to resend email. Please try again.");
+    } finally {
+      setResendLoading(false);
     }
   }
 
@@ -172,10 +300,6 @@ export default function SignUpPage() {
                 </div>
               </div>
               <div className="space-y-1">
-                <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700">Phone Number</Label>
-                <Input id="phoneNumber" type="tel" placeholder="Phone number" value={formData.phoneNumber} onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })} className="h-10 border-gray-300 focus:border-purple-500 focus:ring-purple-500" disabled={isLoading} />
-              </div>
-              <div className="space-y-1">
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
                 <Input id="email" type="email" placeholder="Enter your email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="h-10 border-gray-300 focus:border-purple-500 focus:ring-purple-500" disabled={isLoading} />
               </div>
@@ -210,16 +334,116 @@ export default function SignUpPage() {
                 <Link href="/auth/signin" className="text-purple-600 hover:underline font-medium">Sign in</Link>
               </div>
             </form>
-            {/* Email Sent Modal Popup */}
+            {/* Success Modal Popup */}
             {showSuccess && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
                 <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full flex flex-col items-center animate-fade-in">
-                  <CheckCircle2 className="h-12 w-12 text-green-500 mb-4 animate-bounce-in" />
-                  <h2 className="text-2xl font-bold mb-2 text-gray-900">Email Sent! 🎉</h2>
-                  <p className="mb-4 text-center text-gray-700">We've sent you an email with a confirmation link. Please check your inbox and click the link to activate your account.</p>
-                  <button onClick={() => setShowSuccess(false)} className="mt-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded hover:from-purple-700 hover:to-indigo-700 transition">
-                    Close
-                  </button>
+                  {successType === 'new' && (
+                    <>
+                      <CheckCircle2 className="h-12 w-12 text-green-500 mb-4 animate-bounce-in" />
+                      <h2 className="text-2xl font-bold mb-2 text-gray-900">Email Sent! 🎉</h2>
+                      <p className="mb-4 text-center text-gray-700">We've sent you an email with a confirmation link. Please check your inbox and click the link to activate your account.</p>
+                      <button onClick={() => setShowSuccess(false)} className="mt-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded hover:from-purple-700 hover:to-indigo-700 transition">
+                        Close
+                      </button>
+                      <div className="mt-4 text-sm text-gray-700 text-center">
+                        {getResendAttempts(formData.email) < 2 ? (
+                          <>
+                            Didn't receive an email?{' '}
+                            <button
+                              onClick={handleResendEmail}
+                              className="underline text-purple-600 hover:text-purple-800 disabled:opacity-60"
+                              disabled={resendLoading}
+                            >
+                              {resendLoading ? 'Resending...' : 'Resend'}
+                            </button>
+                            {resendMessage && <div className="mt-2 text-xs text-purple-700">{resendMessage}</div>}
+                          </>
+                        ) : (
+                          <div className="space-y-2">
+                            <p className="text-red-600">Maximum resend attempts reached.</p>
+                            <button 
+                              onClick={clearForm}
+                              className="text-purple-600 hover:text-purple-800 font-medium"
+                            >
+                              Try a different email address
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                  
+                  {successType === 'unverified' && (
+                    <>
+                      <AlertCircle className="h-12 w-12 text-yellow-500 mb-4" />
+                      <h2 className="text-2xl font-bold mb-2 text-gray-900">Account Pending</h2>
+                      <p className="mb-4 text-center text-gray-700">
+                        We found an unverified account with this email. Please check your inbox for a previous confirmation email and follow the instructions to complete your signup.
+                      </p>
+                      <button onClick={() => setShowSuccess(false)} className="mt-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded hover:from-purple-700 hover:to-indigo-700 transition">
+                        Close
+                      </button>
+                      <div className="mt-4 text-sm text-gray-700 text-center">
+                        {getResendAttempts(formData.email) < 2 ? (
+                          <>
+                            Can't find the email?{' '}
+                            <button
+                              onClick={handleResendEmail}
+                              className="underline text-purple-600 hover:text-purple-800 disabled:opacity-60"
+                              disabled={resendLoading}
+                            >
+                              {resendLoading ? 'Sending...' : 'Request New Email'}
+                            </button>
+                            {resendMessage && (
+                              <p className={`mt-2 text-xs ${resendMessage.includes("sent") ? "text-green-600" : "text-red-600"}`}>
+                                {resendMessage}
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <div className="space-y-2">
+                            <p className="text-red-600">Maximum resend attempts reached.</p>
+                            <Link 
+                              href="/auth/signup" 
+                              className="text-purple-600 hover:text-purple-800 font-medium"
+                              onClick={() => setShowSuccess(false)}
+                            >
+                              Try a different email address
+            </Link>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                  
+                  {successType === 'verified' && (
+                    <>
+                      <AlertCircle className="h-12 w-12 text-blue-500 mb-4" />
+                      <h2 className="text-2xl font-bold mb-2 text-gray-900">Account Exists</h2>
+                      <p className="mb-4 text-center text-gray-700">
+                        An account with this email already exists.<br />
+                        If you haven't verified your email, check your inbox or resend the confirmation email.<br />
+                        Otherwise, please sign in to access your account.
+                      </p>
+                      <div className="flex flex-col gap-2 w-full">
+                        <Link href="/auth/signin" className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded hover:from-purple-700 hover:to-indigo-700 transition text-center">
+                          Go to Sign In
+                        </Link>
+                        <button
+                          onClick={handleResendEmail}
+                          className="px-6 py-2 bg-white border border-purple-300 text-purple-700 font-semibold rounded hover:bg-purple-50 transition disabled:opacity-60"
+                          disabled={resendLoading}
+                        >
+                          {resendLoading ? 'Resending...' : 'Resend Confirmation Email'}
+                        </button>
+                        {resendMessage && <div className="mt-2 text-xs text-purple-700 text-center">{resendMessage}</div>}
+                        <button onClick={() => setShowSuccess(false)} className="mt-2 text-sm text-gray-600 hover:text-gray-800">
+                          Close
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}

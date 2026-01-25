@@ -7,14 +7,17 @@ import { Analytics } from "@/components/analytics"
 import { Testimonials } from "@/components/testimonials"
 import { Pricing } from "@/components/pricing"
 import { Footer } from "@/components/footer"
+import { useRouter } from "next/navigation"
 
 export default function LandingPage() {
+  const router = useRouter()
+
   const handleSignInClick = () => {
-    window.location.href = "/auth/signin" // Direct navigation to sign-in page
+    router.push("/auth/signin")
   }
 
   const handleSignUpClick = () => {
-    window.location.href = "/auth/signup" // Direct navigation to sign-up page
+    router.push("/auth/signup")
   }
 
   return (

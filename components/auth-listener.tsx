@@ -15,7 +15,7 @@ export function AuthListener() {
             .update({ has_confirmed_email: true })
             .eq("email", session.user.email);
         }
-        router.push("/payment");
+        router.push("/billing");
       }
     });
     return () => {

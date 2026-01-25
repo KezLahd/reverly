@@ -30,9 +30,10 @@ interface Contact {
 interface ContactsTableProps {
   userId: string
   searchTerm: string
+  onContactsLoaded?: (contacts: Contact[]) => void
 }
 
-export function ContactsTable({ userId, searchTerm }: ContactsTableProps) {
+export function ContactsTable({ userId, searchTerm, onContactsLoaded }: ContactsTableProps) {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -55,7 +56,9 @@ export function ContactsTable({ userId, searchTerm }: ContactsTableProps) {
       if (error) {
         console.error("Error loading contacts:", error)
       } else {
-        setContacts(data || [])
+        const contactsData = data || []
+        setContacts(contactsData)
+        onContactsLoaded?.(contactsData)
       }
     } catch (error) {
       console.error("Error loading contacts:", error)

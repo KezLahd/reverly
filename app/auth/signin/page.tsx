@@ -45,7 +45,16 @@ export default function SignInPage() {
           data: { user },
         } = await supabase.auth.getUser()
         if (user) {
-          router.push("/dashboard")
+          // Check if user has a profile
+          const { data: profile } = await supabase.from("user_profiles").select("subscription_status").eq("id", user.id).single()
+          const pathname = window.location.pathname;
+          if (!profile || !profile.subscription_status) {
+            router.push("/auth/signup/completeselection")
+          } else if (profile.subscription_status === 'active' || profile.subscription_status === 'paid') {
+            router.push("/dashboard")
+          } else {
+            router.push("/billing")
+          }
         }
       } catch (error) {
         // Ignore errors, user is not logged in
@@ -71,16 +80,25 @@ export default function SignInPage() {
       })
 
       if (error) {
-        setError(error.message)
+        if (error.message.includes('User not found')) {
+          setError('No account found with this email.')
+        } else if (error.message.includes('Invalid login credentials')) {
+          setError('Invalid login credentials.')
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('Please confirm your email address. Check your inbox for a confirmation link.')
+        } else {
+          setError(error.message)
+        }
       } else if (data.user) {
         // Check if user has a profile to determine redirect
-        const { data: profile } = await supabase.from("user_profiles").select("*").eq("id", data.user.id).single()
-
-        if (profile) {
+        const { data: profile } = await supabase.from("user_profiles").select("subscription_status").eq("id", data.user.id).single()
+        const pathname = window.location.pathname;
+        if (!profile || !profile.subscription_status) {
+          router.push("/auth/signup/completeselection")
+        } else if (profile.subscription_status === 'active' || profile.subscription_status === 'paid') {
           router.push("/dashboard")
         } else {
-          // If no profile exists, redirect to complete signup
-          router.push("/auth/signup")
+          router.push("/billing")
         }
       }
     } catch (err) {
@@ -198,7 +216,15 @@ export default function SignInPage() {
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>
+                    {error}
+                    {error === 'Invalid login credentials.' && (
+                      <>
+                        {" "}
+                        <Link href="/auth/forgot-password" className="text-purple-600 hover:underline ml-2">Forgot password?</Link>
+                      </>
+                    )}
+                  </AlertDescription>
                 </Alert>
               )}
 

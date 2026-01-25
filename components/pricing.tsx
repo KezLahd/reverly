@@ -318,13 +318,10 @@ export function Pricing({ onSignUpClick }: PricingProps) {
       id="pricing"
     >
       <div className="container mx-auto px-4">
+        <div className="text-center mb-4">
+          <h2 className="text-3xl font-bold text-center mb-4">Choose Your Plan</h2>
+        </div>
         <div className="text-center mb-16 space-y-4">
-          <h2 className={`text-4xl lg:text-5xl font-bold ${pricingType === "agency" ? "text-white" : "text-foreground"}`}>Pricing Plans</h2>
-          <p
-            className={`text-xl max-w-3xl mx-auto leading-relaxed ${pricingType === "agency" ? "text-white/90" : "text-slate-600"}`}
-          >
-            Choose the perfect plan to transform your real estate business with intelligent analytics and automation
-          </p>
         </div>
 
         {/* Pricing Type Toggle */}
