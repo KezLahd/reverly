@@ -226,7 +226,7 @@ export default function AgencySignUpForm() {
       };
       console.log('Upsert object:', upsertObj);
       // Upsert into user_profiles
-      const { error: upsertError } = await supabase.from('user_profiles').upsert([
+      const { error: upsertError } = await supabase.from('reverly_user_profiles').upsert([
         upsertObj
       ]);
       if (upsertError) {

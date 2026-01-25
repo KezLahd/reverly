@@ -106,7 +106,7 @@ export default function IndividualSignUpPage() {
         updated_at: new Date().toISOString(),
       };
       console.log("[v0] Individual upsert data:", upsertData);
-      const { error: upsertError } = await supabase.from('user_profiles').upsert([upsertData]);
+      const { error: upsertError } = await supabase.from('reverly_user_profiles').upsert([upsertData]);
       if (upsertError) {
         console.error("[v0] Upsert error details:", upsertError);
         setError(`Database error: ${upsertError.message || "Failed to complete signup. Please try again."}`);
