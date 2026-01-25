@@ -41,7 +41,7 @@ export function AddContactDialog({ open, onOpenChange, userId, onContactAdded }:
     setLoading(true)
 
     try {
-      const { error } = await supabase.from("contacts").insert({
+      const { error } = await supabase.from("reverly_contacts").insert({
         user_id: userId,
         first_name: formData.firstName,
         last_name: formData.lastName,

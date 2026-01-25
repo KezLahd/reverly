@@ -102,7 +102,7 @@ export default function CRMDashboard() {
 
         // First get the user profile
         const { data: profile, error: profileError } = await supabase
-          .from("user_profiles")
+          .from("reverly_user_profiles")
           .select("*")
           .eq("id", user.id)
           .single()
@@ -115,7 +115,7 @@ export default function CRMDashboard() {
           // Then get agency info if user is part of an agency
           if (profile.agency_id) {
             const { data: agency, error: agencyError } = await supabase
-              .from("agencies")
+              .from("reverly_agencies")
               .select("agency_location")
               .eq("id", profile.agency_id)
               .single()
@@ -152,19 +152,19 @@ export default function CRMDashboard() {
     try {
       // Get total contacts
       const { count: contactsCount } = await supabase
-        .from("contacts")
+        .from("reverly_contacts")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
 
       // Get total interactions
       const { count: interactionsCount } = await supabase
-        .from("interactions")
+        .from("reverly_interactions")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
 
       // Get average readiness score
       const { data: avgScore } = await supabase
-        .from("contacts")
+        .from("reverly_contacts")
         .select("readiness_score")
         .eq("user_id", userId)
         .not("readiness_score", "is", null)
@@ -180,7 +180,7 @@ export default function CRMDashboard() {
       startOfMonth.setHours(0, 0, 0, 0)
 
       const { count: thisMonthCount } = await supabase
-        .from("interactions")
+        .from("reverly_interactions")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
         .gte("interaction_date", startOfMonth.toISOString())
@@ -199,7 +199,7 @@ export default function CRMDashboard() {
   const loadContacts = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from("contacts")
+        .from("reverly_contacts")
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })

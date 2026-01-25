@@ -46,7 +46,7 @@ export default function SignInPage() {
         } = await supabase.auth.getUser()
         if (user) {
           // Check if user has a profile
-          const { data: profile } = await supabase.from("user_profiles").select("subscription_status").eq("id", user.id).single()
+          const { data: profile } = await supabase.from("reverly_user_profiles").select("subscription_status").eq("id", user.id).single()
           const pathname = window.location.pathname;
           if (!profile || !profile.subscription_status) {
             router.push("/auth/signup/completeselection")
@@ -91,7 +91,7 @@ export default function SignInPage() {
         }
       } else if (data.user) {
         // Check if user has a profile to determine redirect
-        const { data: profile } = await supabase.from("user_profiles").select("subscription_status").eq("id", data.user.id).single()
+        const { data: profile } = await supabase.from("reverly_user_profiles").select("subscription_status").eq("id", data.user.id).single()
         const pathname = window.location.pathname;
         if (!profile || !profile.subscription_status) {
           router.push("/auth/signup/completeselection")

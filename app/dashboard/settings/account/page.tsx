@@ -99,7 +99,7 @@ export default function AccountSettings() {
 
       // Update profile in database
       const { error: updateError } = await supabase
-        .from("user_profiles")
+        .from("reverly_user_profiles")
         .update({
           first_name: formData.firstName,
           last_name: formData.lastName,

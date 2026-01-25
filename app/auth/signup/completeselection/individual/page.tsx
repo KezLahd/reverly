@@ -48,7 +48,7 @@ export default function IndividualSignUpPage() {
         if (user.email_confirmed_at) {
           // Check if user_profiles row exists
           const { data: profile } = await supabase
-            .from('user_profiles')
+            .from('reverly_user_profiles')
             .select('id')
             .eq('id', user.id)
             .single();

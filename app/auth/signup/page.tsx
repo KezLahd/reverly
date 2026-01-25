@@ -106,7 +106,7 @@ export default function SignUpPage() {
             last_name: formData.lastName,
             full_name: `${formData.firstName} ${formData.lastName}`,
           },
-          emailRedirectTo: `https://reverly.mjsons.net/auth/signup/completeselection`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 

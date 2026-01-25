@@ -43,7 +43,7 @@ export function ContactsTable({ userId, searchTerm, onContactsLoaded }: Contacts
 
   const loadContacts = async () => {
     try {
-      let query = supabase.from("contacts").select("*").eq("user_id", userId).order("created_at", { ascending: false })
+      let query = supabase.from("reverly_contacts").select("*").eq("user_id", userId).order("created_at", { ascending: false })
 
       if (searchTerm) {
         query = query.or(

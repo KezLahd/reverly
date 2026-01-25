@@ -165,7 +165,7 @@ export function Analytics() {
       setLoading(true)
       // Get all rows for client-side pagination
       const { data, error } = await supabase
-        .from("landing_page_properties")
+        .from("reverly_landing_page_properties")
         .select("id, address, last_contacted, method, readiness, next_contact, estimated_value, last_agent, agent_profile_url, interaction_count, lead_status, sell_prediction_score")
         .order("last_contacted", { ascending: false })
       if (!error && data) setProperties(data as PropertyRow[])

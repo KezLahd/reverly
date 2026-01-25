@@ -64,7 +64,7 @@ async function handleSubscriptionCreated(subscription: any) {
     return
   }
 
-  const { error } = await supabase.from("user_profiles").upsert({
+  const { error } = await supabase.from("reverly_user_profiles").upsert({
     id: userId,
     stripe_customer_id: subscription.customer,
     stripe_subscription_id: subscription.id,
@@ -91,7 +91,7 @@ async function handleSubscriptionUpdated(subscription: any) {
   }
 
   const { error } = await supabase
-    .from("user_profiles")
+    .from("reverly_user_profiles")
     .update({
       subscription_status: subscription.status,
       trial_end: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null,
@@ -116,7 +116,7 @@ async function handleSubscriptionDeleted(subscription: any) {
   }
 
   const { error } = await supabase
-    .from("user_profiles")
+    .from("reverly_user_profiles")
     .update({
       subscription_status: "canceled",
       stripe_subscription_id: null,
@@ -154,7 +154,7 @@ async function handlePaymentSucceeded(invoice: any) {
   if (!userId) return
 
   const { error } = await supabase
-    .from("user_profiles")
+    .from("reverly_user_profiles")
     .update({
       subscription_status: "active",
     })
@@ -179,7 +179,7 @@ async function handlePaymentFailed(invoice: any) {
   if (!userId) return
 
   const { error } = await supabase
-    .from("user_profiles")
+    .from("reverly_user_profiles")
     .update({
       subscription_status: "past_due",
     })
