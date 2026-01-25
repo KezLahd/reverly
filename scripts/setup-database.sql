@@ -8,10 +8,14 @@ DROP TABLE IF EXISTS public.reverly_landing_page_properties CASCADE;
 DROP TABLE IF EXISTS public.reverly_questionnaires CASCADE;
 DROP TABLE IF EXISTS public.reverly_user_profiles CASCADE;
 
+-- Add full_name column to user_profiles if it doesn't exist
+ALTER TABLE IF EXISTS public.user_profiles ADD COLUMN IF NOT EXISTS full_name TEXT;
+
 -- Create user_profiles table (matches Supabase Auth expectations)
 CREATE TABLE IF NOT EXISTS public.user_profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL UNIQUE,
+  full_name TEXT,
   first_name TEXT,
   last_name TEXT,
   phone_number TEXT,
