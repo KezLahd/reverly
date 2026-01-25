@@ -44,7 +44,7 @@ export function UploadAudioDialog({ open, onOpenChange, userId, onAudioUploaded 
   const loadContacts = async () => {
     try {
       const { data, error } = await supabase
-        .from("reverly_contacts")
+        .from("contacts")
         .select("id, first_name, last_name")
         .eq("user_id", userId)
         .order("first_name")
@@ -62,7 +62,7 @@ export function UploadAudioDialog({ open, onOpenChange, userId, onAudioUploaded 
   const loadInteractions = async (contactId: string) => {
     try {
       const { data, error } = await supabase
-        .from("reverly_interactions")
+        .from("interactions")
         .select("id, interaction_type, interaction_date")
         .eq("user_id", userId)
         .eq("contact_id", contactId)
@@ -133,7 +133,7 @@ export function UploadAudioDialog({ open, onOpenChange, userId, onAudioUploaded 
       const durationSeconds = Math.round(audio.duration)
 
       // Save record to database
-      const { error: dbError } = await supabase.from("reverly_audio_recordings").insert({
+      const { error: dbError } = await supabase.from("audio_recordings").insert({
         user_id: userId,
         contact_id: formData.contactId,
         interaction_id: formData.interactionId || null,

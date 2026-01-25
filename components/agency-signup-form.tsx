@@ -79,7 +79,7 @@ export default function AgencySignUpForm() {
         if (user.email_confirmed_at) {
           // Check if user_profiles row exists
           const { data: profile } = await supabase
-            .from('reverly_user_profiles')
+            .from('user_profiles')
             .select('id')
             .eq('id', user.id)
             .single();
@@ -193,7 +193,7 @@ export default function AgencySignUpForm() {
       };
       console.log('Upsert object:', upsertObj);
       // Upsert into user_profiles
-      const { error: upsertError } = await supabase.from('reverly_user_profiles').upsert([
+      const { error: upsertError } = await supabase.from('user_profiles').upsert([
         upsertObj
       ]);
       if (upsertError) {

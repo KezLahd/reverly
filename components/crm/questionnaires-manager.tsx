@@ -25,7 +25,7 @@ export function QuestionnairesManager({ userId }: QuestionnairesManagerProps) {
     try {
       // Load questionnaires
       const { data: questionnairesData } = await supabase
-        .from("reverly_questionnaires")
+        .from("questionnaires")
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })

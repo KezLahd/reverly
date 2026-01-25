@@ -102,7 +102,7 @@ export default function CRMDashboard() {
 
         // First get the user profile
         const { data: profile, error: profileError } = await supabase
-          .from("reverly_user_profiles")
+          .from("user_profiles")
           .select("*")
           .eq("id", user.id)
           .single()
@@ -152,19 +152,19 @@ export default function CRMDashboard() {
     try {
       // Get total contacts
       const { count: contactsCount } = await supabase
-        .from("reverly_contacts")
+        .from("contacts")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
 
       // Get total interactions
       const { count: interactionsCount } = await supabase
-        .from("reverly_interactions")
+        .from("interactions")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
 
       // Get average readiness score
       const { data: avgScore } = await supabase
-        .from("reverly_contacts")
+        .from("contacts")
         .select("readiness_score")
         .eq("user_id", userId)
         .not("readiness_score", "is", null)
@@ -180,7 +180,7 @@ export default function CRMDashboard() {
       startOfMonth.setHours(0, 0, 0, 0)
 
       const { count: thisMonthCount } = await supabase
-        .from("reverly_interactions")
+        .from("interactions")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
         .gte("interaction_date", startOfMonth.toISOString())
@@ -199,7 +199,7 @@ export default function CRMDashboard() {
   const loadContacts = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from("reverly_contacts")
+        .from("contacts")
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })

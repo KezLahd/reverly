@@ -33,7 +33,7 @@ export default function AccountSettings() {
       if (user) {
         setUser(user)
         const { data: profile, error: profileError } = await supabase
-          .from("reverly_user_profiles")
+          .from("user_profiles")
           .select("*")
           .eq("id", user.id)
           .single()
@@ -99,7 +99,7 @@ export default function AccountSettings() {
 
       // Update profile in database
       const { error: updateError } = await supabase
-        .from("reverly_user_profiles")
+        .from("user_profiles")
         .update({
           first_name: formData.firstName,
           last_name: formData.lastName,

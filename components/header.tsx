@@ -43,7 +43,7 @@ export function Header({ onSignInClick }: HeaderProps) {
   const handleDashboard = async () => {
     try {
       console.log("Dashboard clicked, user:", user?.id)
-      const { data: profile, error } = await supabase.from("reverly_user_profiles").select("subscription_status").eq("id", user.id).single()
+      const { data: profile, error } = await supabase.from("user_profiles").select("subscription_status").eq("id", user.id).single()
       console.log("Profile check result:", { profile, error })
       
       // Create and submit a form to force navigation

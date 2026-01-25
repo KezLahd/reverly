@@ -96,10 +96,9 @@ export default function SignUpPage() {
     
     try {
       const supabase = getSupabase()
-      
-      // Try signUp first, but if it fails due to DB error, use signInWithOtp instead
-      // This bypasses the Supabase Auth database save that's causing the error
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // Note: Skipping RPC check - auth will handle duplicate emails
+      // Proceed directly with sign up
+      const { error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -107,25 +106,7 @@ export default function SignUpPage() {
         },
       })
 
-      // If signup fails with database error, try OTP as fallback
-      if (signUpError?.message?.includes('Database error')) {
-        console.log("[v0] Signup DB error, trying OTP fallback");
-        const { error: otpError } = await supabase.auth.signInWithOtp({
-          email: formData.email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
-        });
-        
-        if (otpError) {
-          console.error("[v0] OTP error:", otpError);
-          setError(otpError.message || "An error occurred. Please try again.");
-        } else {
-          // OTP sent successfully
-          setSuccessType('new');
-          setShowSuccess(true);
-        }
-      } else if (signUpError) {
+      if (signUpError) {
         console.error("[v0] Sign up error:", signUpError);
         // Handle specific errors
         if (signUpError.message.includes('User already registered')) {

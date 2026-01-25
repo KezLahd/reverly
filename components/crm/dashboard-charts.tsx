@@ -75,7 +75,7 @@ export function DashboardCharts({ userId, detailed = false }: DashboardChartsPro
 
   const getMonthlyInteractions = async () => {
     const { data } = await supabase
-      .from("reverly_interactions")
+      .from("interactions")
       .select("interaction_date, interaction_type")
       .eq("user_id", userId)
       .gte("interaction_date", new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000).toISOString())
@@ -103,7 +103,7 @@ export function DashboardCharts({ userId, detailed = false }: DashboardChartsPro
 
   const getReadinessDistribution = async () => {
     const { data } = await supabase
-      .from("reverly_contacts")
+      .from("contacts")
       .select("readiness_score")
       .eq("user_id", userId)
       .not("readiness_score", "is", null)
@@ -153,7 +153,7 @@ export function DashboardCharts({ userId, detailed = false }: DashboardChartsPro
 
   const getWeeklyActivity = async () => {
     const { data } = await supabase
-      .from("reverly_interactions")
+      .from("interactions")
       .select("interaction_date")
       .eq("user_id", userId)
       .gte("interaction_date", new Date(Date.now() - 8 * 7 * 24 * 60 * 60 * 1000).toISOString())

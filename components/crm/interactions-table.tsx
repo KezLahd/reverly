@@ -40,7 +40,7 @@ export function InteractionsTable({ userId, searchTerm = "", limit }: Interactio
     const fetchInteractions = async () => {
       setLoading(true)
       let query = supabase
-        .from("reverly_interactions")
+        .from("interactions")
         .select("*")
         .eq("user_id", userId)
         .order("interaction_date", { ascending: false })

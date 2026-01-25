@@ -45,7 +45,7 @@ export function AddInteractionDialog({ open, onOpenChange, userId, onInteraction
   const loadContacts = async () => {
     try {
       const { data, error } = await supabase
-        .from("reverly_contacts")
+        .from("contacts")
         .select("id, first_name, last_name")
         .eq("user_id", userId)
         .order("first_name")
@@ -67,7 +67,7 @@ export function AddInteractionDialog({ open, onOpenChange, userId, onInteraction
     try {
       const interactionDateTime = new Date(`${formData.interactionDate}T${formData.interactionTime}`)
 
-      const { error } = await supabase.from("reverly_interactions").insert({
+      const { error } = await supabase.from("interactions").insert({
         user_id: userId,
         contact_id: formData.contactId,
         interaction_type: formData.interactionType,
@@ -87,7 +87,7 @@ export function AddInteractionDialog({ open, onOpenChange, userId, onInteraction
         // Update contact's last contact date and readiness score
         if (formData.readinessScore) {
           await supabase
-            .from("reverly_contacts")
+            .from("contacts")
             .update({
               last_contact_date: interactionDateTime.toISOString(),
               readiness_score: Number.parseInt(formData.readinessScore),
@@ -95,7 +95,7 @@ export function AddInteractionDialog({ open, onOpenChange, userId, onInteraction
             .eq("id", formData.contactId)
         } else {
           await supabase
-            .from("reverly_contacts")
+            .from("contacts")
             .update({
               last_contact_date: interactionDateTime.toISOString(),
             })

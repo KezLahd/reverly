@@ -42,7 +42,7 @@ export function AudioRecordingsTable({ userId, searchTerm }: AudioRecordingsTabl
   const loadRecordings = async () => {
     try {
       const query = supabase
-        .from("reverly_audio_recordings")
+        .from("audio_recordings")
         .select(`
           *,
           contacts (

@@ -116,7 +116,7 @@ export async function POST(request: Request) {
 
     // Store customer and subscription info in the database
     const { error: updateError } = await supabase
-      .from("reverly_user_profiles")
+      .from("user_profiles")
       .update({
         stripe_customer_id: customer.id,
         stripe_subscription_id: subscription.id,
