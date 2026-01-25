@@ -229,8 +229,8 @@ export function AnalyticsTable({
           </button>
         </div>
       )}
-      {/* Pagination Footer */}
-      <div className="flex justify-center items-center bg-slate-100 border-t border-slate-200 py-3 mt-0">
+      {/* Pagination Footer - spans full width */}
+      <div className="w-full flex justify-center items-center bg-slate-100 border-t border-slate-200 py-3 mt-0">
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i + 1}
@@ -245,4 +245,4 @@ export function AnalyticsTable({
       </div>
     </div>
   )
-} 
+}

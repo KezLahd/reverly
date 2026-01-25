@@ -17,7 +17,7 @@ import {
   CheckCircle2,
   ArrowLeft,
 } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { GlowButton } from "@/components/glow-button"
 
@@ -95,46 +95,21 @@ export default function SignUpPage() {
     setIsLoading(true)
     
     try {
-      // Check user status using the secure function
-      const { data: userStatus, error: userCheckError } = await supabase
-        .rpc('check_user_status', {
-          email: formData.email
-        }) as { data: UserStatus | null, error: any };
-
-      // If we get a result
-      if (!userCheckError && userStatus) {
-        if (userStatus.exists) {
-          if (userStatus.is_verified) {
-            // User exists and is verified
-            setSuccessType('verified');
-          } else {
-            // User exists but not verified
-            setSuccessType('unverified');
-          }
-          setShowSuccess(true);
-          return;
-        }
-        // If userStatus.exists is false, proceed with sign up
-      }
-
-      // If user doesn't exist, proceed with sign up
+      const supabase = getSupabase()
+      // Note: Skipping RPC check - auth will handle duplicate emails
+      // Proceed directly with sign up
       const { error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            full_name: `${formData.firstName} ${formData.lastName}`,
-          },
-          emailRedirectTo: `https://reverly.mjsons.net/auth/signup/completeselection`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
       if (signUpError) {
+        console.error("[v0] Sign up error:", signUpError);
         // Handle specific errors
         if (signUpError.message.includes('User already registered')) {
-          // This should be rare since we already checked, but handle it
           setSuccessType('unverified');
           setShowSuccess(true);
         } else {
@@ -178,15 +153,17 @@ export default function SignUpPage() {
     setResendMessage("");
     
     try {
+      const supabase = getSupabase()
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: formData.email,
         options: {
-          emailRedirectTo: `https://reverly.mjsons.net/auth/signup/completeselection`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       
       if (error) {
+        console.error("[v0] Resend error:", error);
         if (error.message.includes('Too Many Requests')) {
           setResendMessage("Too many attempts. Please wait a few minutes before trying again.");
         } else {

@@ -49,6 +49,290 @@ const readinessData = [
   { score: "0-49", properties: 25, color: "#ede9fe" },
 ]
 
+// Sample landing page properties for demo - Sydney Australia
+const sampleProperties: PropertyRow[] = [
+  {
+    id: "1",
+    address: "42 Macquarie Street, Sydney, NSW 2000",
+    last_contacted: "2025-01-15",
+    method: "door",
+    readiness: 85,
+    next_contact: "2025-01-22",
+    estimated_value: "$2,450,000",
+    last_agent: "James Mitchell",
+    agent_profile_url: "/agents/james-mitchell.jpg",
+    interaction_count: 3,
+    lead_status: "hot",
+    sell_prediction_score: "92",
+  },
+  {
+    id: "2",
+    address: "156 Oxford Street, Paddington, NSW 2021",
+    last_contacted: "2025-01-12",
+    method: "phone",
+    readiness: 72,
+    next_contact: "2025-01-19",
+    estimated_value: "$1,850,000",
+    last_agent: "Sophie Chen",
+    agent_profile_url: "/agents/sophie-chen.jpg",
+    interaction_count: 2,
+    lead_status: "warm",
+    sell_prediction_score: "78",
+  },
+  {
+    id: "3",
+    address: "87 Neutral Bay Road, Neutral Bay, NSW 2089",
+    last_contacted: "2025-01-10",
+    method: "ai",
+    readiness: 65,
+    next_contact: "2025-01-20",
+    estimated_value: "$2,100,000",
+    last_agent: "James Mitchell",
+    agent_profile_url: "/agents/james-mitchell.jpg",
+    interaction_count: 4,
+    lead_status: "interested",
+    sell_prediction_score: "68",
+  },
+  {
+    id: "4",
+    address: "234 Ocean Street, Wooloomooloo, NSW 2011",
+    last_contacted: "2025-01-08",
+    method: "door",
+    readiness: 55,
+    next_contact: "2025-01-25",
+    estimated_value: "$1,675,000",
+    last_agent: "Sophie Chen",
+    agent_profile_url: "/agents/sophie-chen.jpg",
+    interaction_count: 1,
+    lead_status: "new",
+    sell_prediction_score: "45",
+  },
+  {
+    id: "5",
+    address: "512 Bay Road, Mosman, NSW 2088",
+    last_contacted: "2025-01-05",
+    method: "phone",
+    readiness: 42,
+    next_contact: "2025-01-28",
+    estimated_value: "$1,450,000",
+    last_agent: "David Roberts",
+    agent_profile_url: "/agents/david-roberts.jpg",
+    interaction_count: 1,
+    lead_status: "cold",
+    sell_prediction_score: "32",
+  },
+  {
+    id: "6",
+    address: "78 Military Road, Watsons Bay, NSW 2030",
+    last_contacted: "2025-01-14",
+    method: "ai",
+    readiness: 88,
+    next_contact: "2025-01-21",
+    estimated_value: "$3,200,000",
+    last_agent: "David Roberts",
+    agent_profile_url: "/agents/david-roberts.jpg",
+    interaction_count: 5,
+    lead_status: "hot",
+    sell_prediction_score: "95",
+  },
+  {
+    id: "7",
+    address: "91 Coogee Bay Road, Coogee, NSW 2034",
+    last_contacted: "2025-01-11",
+    method: "door",
+    readiness: 76,
+    next_contact: "2025-01-18",
+    estimated_value: "$1,925,000",
+    last_agent: "Rachel Taylor",
+    agent_profile_url: "/agents/rachel-taylor.jpg",
+    interaction_count: 3,
+    lead_status: "warm",
+    sell_prediction_score: "81",
+  },
+  {
+    id: "8",
+    address: "203 Arden Street, Clovelly, NSW 2031",
+    last_contacted: "2025-01-09",
+    method: "phone",
+    readiness: 68,
+    next_contact: "2025-01-23",
+    estimated_value: "$1,750,000",
+    last_agent: "James Mitchell",
+    agent_profile_url: "/agents/james-mitchell.jpg",
+    interaction_count: 2,
+    lead_status: "interested",
+    sell_prediction_score: "62",
+  },
+  {
+    id: "9",
+    address: "445 New South Head Road, Edgecliff, NSW 2027",
+    last_contacted: "2025-01-13",
+    method: "ai",
+    readiness: 82,
+    next_contact: "2025-01-20",
+    estimated_value: "$2,350,000",
+    last_agent: "Rachel Taylor",
+    agent_profile_url: "/agents/rachel-taylor.jpg",
+    interaction_count: 4,
+    lead_status: "hot",
+    sell_prediction_score: "88",
+  },
+  {
+    id: "10",
+    address: "112 Beach Street, Darling Point, NSW 2027",
+    last_contacted: "2025-01-07",
+    method: "door",
+    readiness: 50,
+    next_contact: "2025-01-26",
+    estimated_value: "$1,625,000",
+    last_agent: "Sophie Chen",
+    agent_profile_url: "/agents/sophie-chen.jpg",
+    interaction_count: 1,
+    lead_status: "new",
+    sell_prediction_score: "38",
+  },
+  {
+    id: "11",
+    address: "567 Victoria Street, Potts Point, NSW 2011",
+    last_contacted: "2025-01-16",
+    method: "phone",
+    readiness: 92,
+    next_contact: "2025-01-23",
+    estimated_value: "$3,100,000",
+    last_agent: "Nicole Barnes",
+    agent_profile_url: "/agents/rachel-taylor.jpg",
+    interaction_count: 6,
+    lead_status: "hot",
+    sell_prediction_score: "98",
+  },
+  {
+    id: "12",
+    address: "89 Crown Street, Surry Hills, NSW 2010",
+    last_contacted: "2025-01-06",
+    method: "ai",
+    readiness: 45,
+    next_contact: "2025-01-27",
+    estimated_value: "$1,550,000",
+    last_agent: "Mark Harrison",
+    agent_profile_url: "/agents/david-roberts.jpg",
+    interaction_count: 1,
+    lead_status: "cold",
+    sell_prediction_score: "28",
+  },
+  {
+    id: "13",
+    address: "324 King Street, Newtown, NSW 2042",
+    last_contacted: "2025-01-04",
+    method: "door",
+    readiness: 35,
+    next_contact: "2025-01-30",
+    estimated_value: "$1,200,000",
+    last_agent: "Susan Perry",
+    agent_profile_url: "/agents/james-mitchell.jpg",
+    interaction_count: 0,
+    lead_status: "inactive",
+    sell_prediction_score: "15",
+  },
+  {
+    id: "14",
+    address: "678 Parramatta Road, Glebe, NSW 2037",
+    last_contacted: "2025-01-17",
+    method: "phone",
+    readiness: 79,
+    next_contact: "2025-01-24",
+    estimated_value: "$2,050,000",
+    last_agent: "Christopher Day",
+    agent_profile_url: "/agents/sophie-chen.jpg",
+    interaction_count: 3,
+    lead_status: "warm",
+    sell_prediction_score: "84",
+  },
+  {
+    id: "15",
+    address: "245 Enmore Road, Enmore, NSW 2042",
+    last_contacted: "2025-01-02",
+    method: "ai",
+    readiness: 58,
+    next_contact: "2025-01-29",
+    estimated_value: "$1,475,000",
+    last_agent: "Patricia Wilson",
+    agent_profile_url: "/agents/rachel-taylor.jpg",
+    interaction_count: 2,
+    lead_status: "new",
+    sell_prediction_score: "52",
+  },
+  {
+    id: "16",
+    address: "156 Marrickville Road, Marrickville, NSW 2204",
+    last_contacted: "2025-01-18",
+    method: "door",
+    readiness: 86,
+    next_contact: "2025-01-25",
+    estimated_value: "$1,875,000",
+    last_agent: "Robert Kennedy",
+    agent_profile_url: "/agents/david-roberts.jpg",
+    interaction_count: 4,
+    lead_status: "hot",
+    sell_prediction_score: "91",
+  },
+  {
+    id: "17",
+    address: "412 Constance Street, Stanmore, NSW 2048",
+    last_contacted: "2025-01-03",
+    method: "phone",
+    readiness: 40,
+    next_contact: "2025-02-01",
+    estimated_value: "$1,325,000",
+    last_agent: "Jennifer Price",
+    agent_profile_url: "/agents/james-mitchell.jpg",
+    interaction_count: 1,
+    lead_status: "cold",
+    sell_prediction_score: "22",
+  },
+  {
+    id: "18",
+    address: "734 Anzac Parade, Maroubra, NSW 2035",
+    last_contacted: "2025-01-19",
+    method: "ai",
+    readiness: 74,
+    next_contact: "2025-01-26",
+    estimated_value: "$1,625,000",
+    last_agent: "Daniel Cooper",
+    agent_profile_url: "/agents/sophie-chen.jpg",
+    interaction_count: 3,
+    lead_status: "interested",
+    sell_prediction_score: "75",
+  },
+  {
+    id: "19",
+    address: "189 The Esplanade, Balmoral Beach, NSW 2088",
+    last_contacted: "2025-01-20",
+    method: "door",
+    readiness: 89,
+    next_contact: "2025-01-27",
+    estimated_value: "$2,950,000",
+    last_agent: "Barbara Stone",
+    agent_profile_url: "/agents/rachel-taylor.jpg",
+    interaction_count: 5,
+    lead_status: "hot",
+    sell_prediction_score: "96",
+  },
+  {
+    id: "20",
+    address: "521 Roscoe Street, Bondi, NSW 2026",
+    last_contacted: "2025-01-01",
+    method: "phone",
+    readiness: 38,
+    next_contact: "2025-02-02",
+    estimated_value: "$1,550,000",
+    last_agent: "Paul Thompson",
+    agent_profile_url: "/agents/david-roberts.jpg",
+    interaction_count: 1,
+    lead_status: "inactive",
+    sell_prediction_score: "18",
+  },
+]
+
 // Update PropertyRow interface to match DB
 interface PropertyRow {
   id: string
@@ -65,39 +349,37 @@ interface PropertyRow {
   sell_prediction_score: string | null
 }
 
-// Update DEFAULT_COLUMNS to match DB
+// Update DEFAULT_COLUMNS to match DB - Agent columns first, always visible
 const DEFAULT_COLUMNS = [
+  { key: "agent_profile_url", label: "Agent Profile" },
+  { key: "last_agent", label: "Last Agent" },
   { key: "address", label: "Address" },
   { key: "last_contacted", label: "Date Last Contacted" },
   { key: "method", label: "Method" },
   { key: "readiness", label: "Readiness to Sell" },
   { key: "next_contact", label: "Suggested Next Contact" },
   { key: "estimated_value", label: "Est. Value" },
-  { key: "last_agent", label: "Last Agent" },
-  { key: "agent_profile_url", label: "Agent Profile" },
   { key: "interaction_count", label: "Interactions" },
   { key: "lead_status", label: "Lead Status" },
   { key: "sell_prediction_score", label: "Sell Prediction" },
 ]
 
-const methodIcon = (method: string) => {
-  if (method === "door") return <DoorOpen className="h-5 w-5 text-purple-600" />
-  if (method === "phone") return <Phone className="h-5 w-5 text-purple-600" />
-  if (method === "ai") return <Bot className="h-5 w-5 text-purple-600" />
-  return null
+const getDefaultVisibleColumns = () => {
+  // Agent columns are always visible (first 2), toggle 4 others on desktop
+  const agentColumns = ["agent_profile_url", "last_agent"]
+  const toggleableColumns = DEFAULT_COLUMNS.slice(2) // address, last_contacted, method, readiness, etc.
+  
+  if (typeof window !== "undefined" && window.innerWidth < 768) {
+    return DEFAULT_COLUMNS.map(c => c.key) // all on mobile
+  }
+  // On desktop: always show agent columns + first 4 toggleable columns
+  return [...agentColumns, ...toggleableColumns.slice(0, 4).map(c => c.key)]
 }
 
 const readinessColor = (score: number) => {
   if (score <= 33) return "bg-gradient-to-r from-red-500 to-red-300 text-white"
   if (score <= 66) return "bg-gradient-to-r from-yellow-400 to-yellow-200 text-gray-900"
   return "bg-gradient-to-r from-green-500 to-green-300 text-white"
-}
-
-const getDefaultVisibleColumns = () => {
-  if (typeof window !== "undefined" && window.innerWidth < 768) {
-    return DEFAULT_COLUMNS.map(c => c.key) // all on mobile
-  }
-  return DEFAULT_COLUMNS.slice(0, 4).map(c => c.key) // first 4 on desktop
 }
 
 // Add filter types
@@ -163,12 +445,8 @@ export function Analytics() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-      // Get all rows for client-side pagination
-      const { data, error } = await supabase
-        .from("landing_page_properties")
-        .select("id, address, last_contacted, method, readiness, next_contact, estimated_value, last_agent, agent_profile_url, interaction_count, lead_status, sell_prediction_score")
-        .order("last_contacted", { ascending: false })
-      if (!error && data) setProperties(data as PropertyRow[])
+      // Use sample data for demo on landing page
+      setProperties(sampleProperties)
       setLoading(false)
     }
     fetchData()
@@ -184,6 +462,9 @@ export function Analytics() {
   }, [])
 
   const toggleColumn = (key: string) => {
+    // Prevent toggling agent columns - they're always visible
+    if (key === "agent_profile_url" || key === "last_agent") return
+    
     setVisibleColumns(cols =>
       cols.includes(key) ? cols.filter(c => c !== key) : [...cols, key]
     )
@@ -372,17 +653,24 @@ export function Analytics() {
                       </Popover.Button>
                       <Popover.Panel className="absolute right-0 mt-2 bg-white rounded shadow-lg p-2 w-44 z-50 border border-slate-200">
                         <div className="font-semibold mb-1 text-xs text-slate-700">Show Columns</div>
-                        {DEFAULT_COLUMNS.map(col => (
-                          <label key={col.key} className="flex items-center space-x-2 py-1 cursor-pointer text-xs text-slate-700">
-                            <input
-                              type="checkbox"
-                              checked={visibleColumns.includes(col.key)}
-                              onChange={() => toggleColumn(col.key)}
-                              className="accent-primary h-3 w-3"
-                            />
-                            <span className="truncate">{col.label}</span>
-                          </label>
-                        ))}
+                        {DEFAULT_COLUMNS.map(col => {
+                          const isAgentColumn = col.key === "agent_profile_url" || col.key === "last_agent"
+                          return (
+                            <label key={col.key} className="flex items-center space-x-2 py-1 cursor-pointer text-xs text-slate-700">
+                              <input
+                                type="checkbox"
+                                checked={visibleColumns.includes(col.key)}
+                                onChange={() => toggleColumn(col.key)}
+                                disabled={isAgentColumn}
+                                className="accent-primary h-3 w-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                              />
+                              <span className={`truncate ${isAgentColumn ? 'font-medium text-slate-500' : ''}`}>
+                                {col.label}
+                                {isAgentColumn && <span className="text-slate-400 text-xs ml-1">(always visible)</span>}
+                              </span>
+                            </label>
+                          )
+                        })}
                       </Popover.Panel>
                     </Popover>
                   </div>

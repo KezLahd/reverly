@@ -112,21 +112,11 @@ export default function CRMDashboard() {
         if (profile) {
           setUserProfile(profile)
 
-          // Then get agency info if user is part of an agency
-          if (profile.agency_id) {
-            const { data: agency, error: agencyError } = await supabase
-              .from("agencies")
-              .select("agency_location")
-              .eq("id", profile.agency_id)
-              .single()
-            
-            console.log("Dashboard page: Agency check result:", { agency, error: agencyError })
-
-            if (agency?.agency_location) {
-              const [lat, lng] = agency.agency_location.split(',').map(Number)
-              if (!isNaN(lat) && !isNaN(lng)) {
-                setAgencyLocation({ lat, lng, zoom: 12 })
-              }
+          // Then get agency location from profile if available
+          if (profile.agency_location) {
+            const [lat, lng] = profile.agency_location.split(',').map(Number)
+            if (!isNaN(lat) && !isNaN(lng)) {
+              setAgencyLocation({ lat, lng, zoom: 12 })
             }
           } else if (profile.selected_agency_location) {
             const [lat, lng] = profile.selected_agency_location.split(',').map(Number)

@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Toast } from "@/components/ui/toast"
 import { Building2, Eye, EyeOff, Check, ChevronsUpDown, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -37,6 +37,7 @@ export default function IndividualSignUpPage() {
   useEffect(() => {
     // Check if user is already logged in and has confirmed email
     const checkUser = async () => {
+      const supabase = getSupabase()
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         // Get first name and email for greeting
@@ -92,23 +93,23 @@ export default function IndividualSignUpPage() {
         return;
       }
       // Upsert into user_profiles
-      const { error: upsertError } = await supabase.from('user_profiles').upsert([
-        {
-          id: user.id,
-          first_name: user.user_metadata?.first_name || '',
-          last_name: user.user_metadata?.last_name || '',
-          email: user.email,
-          phone_number: formData.phoneNumber,
-          user_type: "individual",
-          selected_agency: selectedAgency?.name || null,
-          agency_id: selectedAgency?.id || null,
-          marketing_opt_in: formData.marketingOptIn,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }
-      ]);
+      const upsertData = {
+        id: user.id,
+        first_name: user.user_metadata?.first_name || '',
+        last_name: user.user_metadata?.last_name || '',
+        email: user.email,
+        phone_number: formData.phoneNumber,
+        user_type: "individual",
+        selected_agency: selectedAgency?.name || null,
+        agency_id: selectedAgency?.id || null,
+        marketing_opt_in: formData.marketingOptIn,
+        updated_at: new Date().toISOString(),
+      };
+      console.log("[v0] Individual upsert data:", upsertData);
+      const { error: upsertError } = await supabase.from('user_profiles').upsert([upsertData]);
       if (upsertError) {
-        setError("Failed to complete signup. Please try again.");
+        console.error("[v0] Upsert error details:", upsertError);
+        setError(`Database error: ${upsertError.message || "Failed to complete signup. Please try again."}`);
         setIsLoading(false);
         return;
       }

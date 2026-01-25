@@ -11,4 +11,4 @@ export default function BillingPage() {
   return (
     <BillingPricing onSignUpClick={handleSignUpClick} />
   )
-} 
+}

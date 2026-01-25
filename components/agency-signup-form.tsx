@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Toast } from "@/components/ui/toast"
 import { Building2, Eye, EyeOff, Loader2, AlertCircle, ArrowLeft, Users, Plus, Minus, ChevronsUpDown, Check } from "lucide-react" // Removed MapPin
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
@@ -48,9 +48,6 @@ export default function AgencySignUpForm() {
   const { toast } = useToast()
   const [agencySearchOpen, setAgencySearchOpen] = useState(false);
   const [selectedAgency, setSelectedAgency] = useState<{ id: string; name: string; location: string } | null>(null);
-
-  // Get the Google Places API key from the environment
-  const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
 
   const pricePerUser = 11.95
   const totalWeeklyPrice = formData.numberOfUsers * pricePerUser
@@ -98,37 +95,7 @@ export default function AgencySignUpForm() {
       }
     };
     checkUser();
-
-    // Google Places Autocomplete logic
-    function initAutocomplete() {
-      if (window.google && locationInputRef.current) {
-        const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current, {
-          types: ["(cities)"]
-        })
-        autocomplete.addListener("place_changed", () => {
-          const place = autocomplete.getPlace()
-          if (place && place.formatted_address) {
-            setFormData((prev) => ({ ...prev, agencyLocation: place.formatted_address }))
-          } else if (place && place.name) {
-            setFormData((prev) => ({ ...prev, agencyLocation: place.name }))
-          }
-        })
-      }
-    }
-
-    if (!window.google) {
-      // Only add script if not already present
-      const script = document.createElement("script")
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_PLACES_API_KEY}&libraries=places`;
-      script.async = true
-      script.onload = initAutocomplete
-      document.body.appendChild(script)
-    } else {
-      initAutocomplete()
-    }
-  }, [router, GOOGLE_PLACES_API_KEY])
-
-  // Removed initializeAutocomplete function
+  }, [router])
 
   const handleAgencySelect = (agency: { id: string; name: string; location: string } | null) => {
     if (!agency) {
@@ -230,8 +197,10 @@ export default function AgencySignUpForm() {
         upsertObj
       ]);
       if (upsertError) {
+        console.error("[v0] Upsert error details:", upsertError);
         toast({
-          title: "Failed to complete signup. Please try again.",
+          title: "Database error saving profile",
+          description: upsertError.message || "Failed to complete signup. Please try again.",
           variant: "destructive",
         });
         setIsLoading(false);

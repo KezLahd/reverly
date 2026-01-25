@@ -391,4 +391,4 @@ const getStars = (planName: string) => {
   if (planName.toLowerCase().includes("pro")) return 2;
   if (planName.toLowerCase().includes("premium")) return 3;
   return 1;
-}; 
+};

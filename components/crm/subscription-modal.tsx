@@ -176,4 +176,4 @@ export function SubscriptionModal({ open, onOpenChange, currentPlan }: Subscript
       </DialogContent>
     </Dialog>
   )
-} 
+}

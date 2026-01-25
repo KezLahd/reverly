@@ -21,7 +21,7 @@ import {
   LineChart,
   ArrowLeft,
 } from "lucide-react" // Import ArrowLeft
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GlowButton } from "@/components/glow-button" // Import GlowButton
@@ -41,6 +41,7 @@ export default function SignInPage() {
     // Check if user is already logged in
     const checkUser = async () => {
       try {
+        const supabase = getSupabase()
         const {
           data: { user },
         } = await supabase.auth.getUser()
@@ -74,6 +75,7 @@ export default function SignInPage() {
     setError("")
 
     try {
+      const supabase = getSupabase()
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
