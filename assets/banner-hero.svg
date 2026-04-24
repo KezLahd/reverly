@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img" aria-label="Reverly">
+  <defs>
+    <linearGradient id="revName" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9400D3"/>
+      <stop offset="100%" stop-color="#C77DFF"/>
+    </linearGradient>
+    <linearGradient id="revBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F0815"/>
+      <stop offset="100%" stop-color="#050208"/>
+    </linearGradient>
+    <radialGradient id="revGlow" cx="80%" cy="50%" r="45%">
+      <stop offset="0%" stop-color="#9400D3" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#0F0815" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="revGrid" width="56" height="56" patternUnits="userSpaceOnUse">
+      <path d="M 56 0 L 0 0 0 56" fill="none" stroke="#9400D3" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="400" fill="url(#revBg)"/>
+  <rect width="1200" height="400" fill="url(#revGrid)"/>
+  <rect width="1200" height="400" fill="url(#revGlow)"/>
+
+  <g transform="translate(80, 54)">
+    <rect width="198" height="28" rx="14" fill="#9400D3" fill-opacity="0.12" stroke="#9400D3" stroke-opacity="0.5"/>
+    <text x="99" y="19" text-anchor="middle" fill="#D8B4FE" font-family="'DM Sans','Inter',system-ui,sans-serif" font-size="11" font-weight="600" letter-spacing="2.4">AI VOICE · SHELVED</text>
+  </g>
+
+  <text x="80" y="238" fill="url(#revName)" font-family="'Instrument Serif','Georgia',serif" font-size="176" letter-spacing="-5">Reverly<tspan fill="#9400D3">.</tspan></text>
+
+  <text x="82" y="286" fill="#E9D5FF" fill-opacity="0.6" font-family="'DM Sans','Inter',system-ui,sans-serif" font-size="18" font-weight="300">An AI voice product for real estate. It got built. It didn't land. Kept as the receipt.</text>
+
+  <g transform="translate(80, 324)" font-family="'DM Sans','Inter',system-ui,sans-serif" font-size="11" font-weight="600" letter-spacing="1.6">
+    <g>
+      <rect width="92" height="26" rx="13" fill="#1a0a2a" stroke="#9400D3" stroke-opacity="0.5"/>
+      <text x="46" y="17" text-anchor="middle" fill="#D8B4FE">NEXT.JS</text>
+    </g>
+    <g transform="translate(100, 0)">
+      <rect width="90" height="26" rx="13" fill="#1a0a2a" stroke="#9400D3" stroke-opacity="0.5"/>
+      <text x="45" y="17" text-anchor="middle" fill="#D8B4FE">VOICE</text>
+    </g>
+    <g transform="translate(198, 0)">
+      <rect width="92" height="26" rx="13" fill="#1a0a2a" stroke="#9400D3" stroke-opacity="0.5"/>
+      <text x="46" y="17" text-anchor="middle" fill="#D8B4FE">STRIPE</text>
+    </g>
+    <g transform="translate(298, 0)">
+      <rect width="104" height="26" rx="13" fill="#1a0a2a" stroke="#9400D3" stroke-opacity="0.5"/>
+      <text x="52" y="17" text-anchor="middle" fill="#D8B4FE">POSTGRES</text>
+    </g>
+  </g>
+
+  <g transform="translate(1010, 200)">
+    <circle r="80" fill="none" stroke="#9400D3" stroke-opacity="0.3" stroke-width="1"/>
+    <circle r="60" fill="none" stroke="#9400D3" stroke-opacity="0.5" stroke-width="1"/>
+    <circle r="40" fill="none" stroke="#9400D3" stroke-opacity="0.7" stroke-width="1"/>
+    <g stroke="#C77DFF" stroke-linecap="round" stroke-width="3">
+      <line x1="-46" y1="0" x2="-46" y2="0"/>
+      <line x1="-34" y1="-12" x2="-34" y2="12"/>
+      <line x1="-22" y1="-24" x2="-22" y2="24"/>
+      <line x1="-10" y1="-30" x2="-10" y2="30"/>
+      <line x1="2" y1="-36" x2="2" y2="36"/>
+      <line x1="14" y1="-28" x2="14" y2="28"/>
+      <line x1="26" y1="-18" x2="26" y2="18"/>
+      <line x1="38" y1="-8" x2="38" y2="8"/>
+    </g>
+    <circle cx="2" cy="0" r="5" fill="#9400D3"/>
+  </g>
+</svg>
