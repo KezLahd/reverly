@@ -94,18 +94,25 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-slate-400 text-sm">&copy; 2025 Reverly. All rights reserved.</p>{" "}
-          {/* Updated copyright year */}
-          <div className="flex space-x-6 mt-4 md:mt-0">
+        <div className="border-t border-slate-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-slate-400 text-sm">&copy; 2025 Reverly. All rights reserved.</p>
+          <p className="text-slate-400 text-sm">
+            Another{" "}
+            <a
+              href="https://instagram.com/kieranjxn"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors"
+            >
+              Kez Curation ↗
+            </a>
+          </p>
+          <div className="flex space-x-6">
             <a href="#" className="text-slate-400 hover:text-primary transition-colors text-sm">
               Privacy Policy
             </a>
             <a href="#" className="text-slate-400 hover:text-primary transition-colors text-sm">
               Terms of Service
-            </a>
-            <a href="#" className="text-slate-400 hover:text-primary transition-colors text-sm">
-              Cookie Policy
             </a>
           </div>
         </div>
