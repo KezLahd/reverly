@@ -3,10 +3,10 @@
 </div>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-Shelved-9400D3?style=for-the-badge&labelColor=0F0815" alt="Shelved"/>
-  <img src="https://img.shields.io/badge/Framework-Next.js-9400D3?style=for-the-badge&labelColor=0F0815" alt="Next.js"/>
-  <img src="https://img.shields.io/badge/Category-AI_Voice-C77DFF?style=for-the-badge&labelColor=0F0815" alt="AI Voice"/>
-  <img src="https://img.shields.io/badge/Payments-Stripe-9400D3?style=for-the-badge&labelColor=0F0815" alt="Stripe"/>
+  <img src="https://img.shields.io/badge/Status-Shelved-9400D3?style=for-the-badge&labelColor=F6F3FB" alt="Shelved"/>
+  <img src="https://img.shields.io/badge/Framework-Next.js-6B21A8?style=for-the-badge&labelColor=F6F3FB" alt="Next.js"/>
+  <img src="https://img.shields.io/badge/Category-AI_Voice-9400D3?style=for-the-badge&labelColor=F6F3FB" alt="AI Voice"/>
+  <img src="https://img.shields.io/badge/Payments-Stripe-6B21A8?style=for-the-badge&labelColor=F6F3FB" alt="Stripe"/>
 </p>
 
 <br/>
@@ -107,5 +107,5 @@ No license granted — source visible as a portfolio artefact. **All rights rese
 ---
 
 <p align="center">
-  <sub>Built by <a href="https://github.com/KezLahd">Kieran Jackson</a> · Shelved 2025</sub>
+  <sub>Built by <a href="https://github.com/KezLahd">Kieran Jackson</a> · Shelved 2025 · Another <a href="https://instagram.com/kieranjxn">Kez Curation ↗</a></sub>
 </p>
